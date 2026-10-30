@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Records</title>
+
+    <!--css-->
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px;
+        }
+
+        select {
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        #output {
+            border: 1px solid black;
+            padding: 15px;
+            width: 350px;
+        }
+    </style>
+</head>
+<body>
+    
+    <h2>Book Records</h2>
+    
+    <label>Select Book: </label>
+    <select id="bookSelect">
+        <option value="">Choose a Book</option>
+    </select>
+
+    <div id="output"></div>
+
+    <!--fetch()-->
+    <script>
+        const jsonURL = "https://raw.githubusercontent.com/Syeramkhtr/book-records/refs/heads/main/books.json"
+
+        /* Fetch JSON */
+        async function loadBooks(){
+            try {
+                const response = await fetch(jsonURL);
+
+                if(!response.ok){
+                    throw new Error("Failed to load JSON");
+                }
+
+                const data = await response.json();
+                
+                const select = document.getElementById("bookSelect");
+
+                /*Add book title into dropdown*/
+
+                data.Books.forEach(book => {
+                    let option = document.createElement("option");
+
+                    option.value = book.title;
+                    option.textContent = book.title;
+
+                    select.appendChild(option);
+                });
+
+                /*When user select book */
+                select.addEventListener("change",function(){
+                    
+                    const selectedTitle = this.value;
+                    
+                    const foundBook = data.Books.find(book =>
+                        book.title === selectedTitle
+                    );
+
+                    if(foundBook) {
+
+                        document.getElementById("output").innerHTML = `
+                        <h3>${foundBook.title}</h3>
+                        <p><b>Author:</b> ${foundBook.author}</p>
+                        <p><b>Publication Year:</b> ${foundBook.publicationYear}
+                        <p><b>Genres:</b> ${foundBook.genres.join(", ")}</p>
+                        `;
+                    }else{
+                        document.getElementById("output").innerHTML = "";
+                    }    
+                });
+
+            }catch(error){
+                console.log(error);
+            }
+        }
+        loadBooks();
+    </script>
+</body>
+</html>
